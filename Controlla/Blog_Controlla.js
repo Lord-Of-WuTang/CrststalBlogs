@@ -1,12 +1,13 @@
-const Blog = require("../models/blog.model");
-const { readingTime } = require("../utils/utils");
+const Blog = require("../Models/blog_model");
+
+const { readingTime } = require("../Utilities/Utility");
 
 const createBlog = async (req, res, next) => {
   try {
-    // Get details from the request
+    // Details from request
     const { title, description, tags, body } = req.body;
 
-    // create blog object
+    // Blog object is created
     const newBlog = new Blog({
       title,
       description: description || title,
@@ -16,7 +17,7 @@ const createBlog = async (req, res, next) => {
       reading_time: readingTime(body),
     });
 
-    // save to database
+    // Obbject is saved to DATABASE
     const createdBlog = await newBlog.save();
     // return response
     return res.status(201).json({
@@ -28,7 +29,7 @@ const createBlog = async (req, res, next) => {
   }
 };
 
-const publishedBlogs = async (req, res, next) => {
+const published = async (req, res, next) => {
   try {
     const blogs = await Blog.find({ state: "published" })
       .select({ title: 1 })
@@ -39,12 +40,12 @@ const publishedBlogs = async (req, res, next) => {
       data: blogs,
     });
   } catch (err) {
-    err.source = "get published blogs controller";
+    err.source = "Controller blogs required";
     next(err);
   }
 };
 
-const publishedBlog = async (req, res, next) => {
+const Blog = async (req, res, next) => {
   try {
     const { id } = req.params;
     const blog = await Blog.findById(id).populate("author", { username: 1 });
@@ -52,11 +53,11 @@ const publishedBlog = async (req, res, next) => {
     if (blog.state !== "published") {
       return res.status(403).json({
         status: false,
-        error: "Requested article is not published",
+        error: "Article is not published",
       });
     }
 
-    // update blog read count
+    // adding a count
     blog.read_count += 1;
     await blog.save();
 
@@ -65,13 +66,13 @@ const publishedBlog = async (req, res, next) => {
       data: blog,
     });
   } catch (err) {
-    err.source = "get published blog controller";
+    err.source = "Controller Blog not Published";
     next(err);
   }
 };
 
 module.exports = {
   createBlog,
-  publishedBlogs,
-  publishedBlog,
+  published,
+  Blog,
 };

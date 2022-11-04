@@ -65,16 +65,16 @@ module.exports = (passport) => {
           const user = await userModel.findOne({ email });
 
           if (!user) {
-            return done(null, false, { message: "User not found" });
+            return done(null, false, { message: "Not found" });
           }
 
           const validate = await user.isValidPassword(password);
 
           if (!validate) {
-            return done(null, false, { message: "Wrong Password!" });
+            return done(null, false, { message: "Incorrect Password!" });
           }
 
-          return done(null, user, { message: "Logged in Successfully!" });
+          return done(null, user, { message: "Logged in!" });
         } catch (error) {
           return done(error);
         }
